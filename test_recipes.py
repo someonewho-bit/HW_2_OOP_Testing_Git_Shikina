@@ -26,6 +26,16 @@ def base_recipe(base_ingredient):
     return Recipe(title="Экспонента", ingredients=[base_ingredient])
 
 
+@pytest.fixture
+def second_recipe(second_ingredient):
+    return Recipe(title="КокаКоля", ingredients=[second_ingredient])
+
+
+@pytest.fixture
+def empty_shop_list():
+    return ShoppingList()
+
+
 # Проверка класса Ingredient
 def test_ingredient_initialization(base_ingredient):
     assert base_ingredient.name == "Мука"
@@ -99,4 +109,46 @@ def test_recipe_len(base_recipe, second_ingredient):
     assert len(base_recipe) == 2
 
 
+#  Проверка класса ShoppingList
+def test_add_recipe(empty_shop_list, base_recipe):
+    empty_shop_list.add_recipe(base_recipe, portions=2)
+    assert empty_shop_list._items[0][0].quantity == 1000
+    assert empty_shop_list._items[0][1] == "Экспонента"
 
+
+def test_add_recipe_incorrect_portions(empty_shop_list, base_recipe):
+    try:
+        empty_shop_list.add_recipe(base_recipe, portions=-1)
+        assert False
+    except ValueError:
+        pass
+
+
+def test_remove_recipe(empty_shop_list, base_recipe, second_recipe):
+    empty_shop_list.add_recipe(base_recipe, portions=1)
+    empty_shop_list.add_recipe(second_recipe, portions=1)
+    empty_shop_list.remove_recipe("Экспонента")
+    assert len(empty_shop_list._items) == 1
+
+
+def test_get_list(empty_shop_list, base_ingredient, base_ingredient_same_name_and_unit, second_ingredient):
+    recipe1 = Recipe(title="Приятный напиток", ingredients=[base_ingredient, second_ingredient])
+    recipe2 = Recipe(title="ПочтиКокаКоля", ingredients=[base_ingredient_same_name_and_unit])
+    empty_shop_list.add_recipe(recipe1, portions=1)
+    empty_shop_list.add_recipe(recipe2, portions=1)
+    final_shoppi_list = empty_shop_list.get_list()
+    assert len(final_shoppi_list) == 2
+    assert final_shoppi_list[0].name == "Вода"
+    assert final_shoppi_list[1].name == "Мука"
+    assert final_shoppi_list[1].quantity == 800.0
+
+
+def test_add_method(base_recipe, second_recipe):
+    listik1 = ShoppingList()
+    listik2 = ShoppingList()
+    listik2.add_recipe(second_recipe, portions=1)
+    listik1.add_recipe(base_recipe, portions=1)
+    combined_list = listik1 + listik2
+    assert len(combined_list._items) == 2
+    assert len(listik1._items) == 1
+    assert len(listik2._items) == 1

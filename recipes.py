@@ -103,7 +103,7 @@ class ShoppingList:
 
     def __add__(self, other):
         new_list = ShoppingList()
-        new_list._items = self._items + other.items
+        new_list._items = self._items + other._items
         return new_list
 
 
