@@ -107,12 +107,15 @@ class ShoppingList:
         return new_list
 
 
+class DietaryRecipe(Recipe):
+    def __init__(self, title: str, diet_type: str, ingredients=None):
+        super().__init__(title, ingredients)
+        self.diet_type = diet_type
 
+    def scale(self, ratio: float):
+        scaled_base = super().scale(ratio)
+        return DietaryRecipe(title=scaled_base.title, diet_type=self.diet_type, ingredients=scaled_base.ingredients)
 
-
-
-
-
-
-
+    def __str__(self):
+        return f"[{self.diet_type}] {self.title}"
 
